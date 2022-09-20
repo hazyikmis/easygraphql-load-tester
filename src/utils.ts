@@ -6,7 +6,7 @@ import {
 } from 'easygraphql-parser'
 import { CreateQuery } from './types/types'
 
-const MAX_DEEP_LEVEL = 4
+const MAX_DEEP_LEVEL = 5
 
 export const getField = (
   field: ParsedField,
