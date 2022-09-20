@@ -6,15 +6,14 @@ import {
 } from 'easygraphql-parser'
 import { CreateQuery } from './types/types'
 
-const MAX_DEEP_LEVEL = 5
-
 export const getField = (
   field: ParsedField,
   schema: ParsedSchema,
+  maxDeepLevel,
   deepLevel = 0
 ) => {
   deepLevel++
-  if (deepLevel > MAX_DEEP_LEVEL) return
+  if (deepLevel > maxDeepLevel) return
 
   if (!schema[field.type]) {
     return field.name
@@ -29,7 +28,7 @@ export const getField = (
   const fields: string[] = []
   nestedType.fields.forEach((field) => {
     if (schema[field.type]) {
-      const nestedField = getField(field, schema, deepLevel)
+      const nestedField = getField(field, schema, maxDeepLevel, deepLevel)
       if (nestedField) {
         fields.push(nestedField)
       }
@@ -93,11 +92,12 @@ export const createQueryArguments = (
 export const createUnionQuery = (
   nestedType: ParsedType,
   schema: ParsedSchema,
-  queryType: string
+  queryType: string,
+  maxDeepLevel: number
 ) => {
   const fields: string[] = []
   nestedType.fields.forEach((field) => {
-    const createdField = getField(field, schema, 2)
+    const createdField = getField(field, schema, maxDeepLevel, 2)
     if (createdField) {
       fields.push(createdField)
     }

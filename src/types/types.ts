@@ -34,6 +34,7 @@ export type CreateQueries = {
   selectedQueries?: string[]
   withMutations?: boolean
   onlyCustomQueries?: boolean
+  maxDeepLevel?: number //  maxDeepLevel for nested fields,
 }
 
 export type LoadTestQuery = {

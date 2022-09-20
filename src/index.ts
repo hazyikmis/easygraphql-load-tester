@@ -106,6 +106,7 @@ export = class LoadTesting {
     selectedQueries,
     withMutations,
     onlyCustomQueries,
+    maxDeepLevel = 5,
   }: CreateQueries = {}) {
     let loadTestQueries: LoadTestQuery[] = []
 
@@ -176,7 +177,11 @@ export = class LoadTesting {
             )
           ) {
             loadTestQueries.push(
-              this.createOperation(query, schemaDefinition.isMutation) as any
+              this.createOperation(
+                query,
+                schemaDefinition.isMutation,
+                maxDeepLevel
+              ) as any
             )
           }
         })
@@ -187,7 +192,11 @@ export = class LoadTesting {
     return flatten(loadTestQueries)
   }
 
-  createOperation(query: ParsedField, isMutation: boolean) {
+  createOperation(
+    query: ParsedField,
+    isMutation: boolean,
+    maxDeepLevel: number
+  ) {
     let queryHeader = query.name
     let name = query.name
     let operationName = query.name.toUpperCase()
@@ -226,7 +235,9 @@ export = class LoadTesting {
       nestedType.types.forEach((type) => {
         const newNestedType = this.schema[type]
 
-        unionQueries.push(createUnionQuery(newNestedType, this.schema, type))
+        unionQueries.push(
+          createUnionQuery(newNestedType, this.schema, type, maxDeepLevel)
+        )
       })
 
       return createQuery({
@@ -240,7 +251,7 @@ export = class LoadTesting {
     } else {
       const fields: string[] = []
       return nestedType.fields.map((field) => {
-        const createdField = getField(field, this.schema)
+        const createdField = getField(field, this.schema, maxDeepLevel)
         if (createdField) {
           fields.push(createdField)
         }
